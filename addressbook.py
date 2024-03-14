@@ -149,7 +149,7 @@ class AddressBook(UserDict[Name, Record]):
         for rec in self.get_all_contacts():
             if rec.birthday is None:
                 continue
-            birthday = rec.birthday.birthdate.date().replace(year=cur_year)
+            birthday = rec.birthday.value.date().replace(year=cur_year)
             if birthday < cur_date:
                 birthday = birthday.replace(year=birthday.year+1)
             delta_days = (birthday - cur_date).days
@@ -168,7 +168,7 @@ class AddressBook(UserDict[Name, Record]):
         return res.rstrip()
             
     def __str__(self):
-        return "\n".join(map(str, self.get_all_contacts))
+        return "\n".join(map(str, self.get_all_contacts()))
 
     def search(self, search_str: str):
         found_contacts = []
