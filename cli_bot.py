@@ -75,6 +75,14 @@ def show_birthday(args, contacts: AddressBook):
         return "Birthday don't setted."
     return f"{name}'s birthday is {rec.birthday}"
 
+@input_error("Give me argument for search.")
+def search(args, contacts: AddressBook):
+    search_arg = args[0]
+    if len(search_arg) < 3:
+        return "Search string must be at least 3 characters long."
+    result = contacts.search(search_arg) 
+    return '\n'.join([str(rec) for rec in result])
+
 class PDP11Bot(cmd.Cmd):
     intro = "Welcome to the assistant bot!\n"
     prompt = "(pdp-11) "
@@ -131,6 +139,10 @@ class PDP11Bot(cmd.Cmd):
     def do_delete_address(self, arg):
         "Delete the contact address"
         print(del_address(self.parse_input(arg), self.book))
+
+    def do_search(self, arg):
+        "Search data in contacts"
+        print(search(self.parse_input(arg), self.book))    
 
     # ---- preprocessors ----
     def preloop(self):
