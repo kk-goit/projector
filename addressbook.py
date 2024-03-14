@@ -113,14 +113,14 @@ class Record:
             self.add_phone(phone)
 
     def __str__(self):
-        res = f"Contact name: {self.name}, phones: {'; '.join(p.value for p in self.phones)}" 
+        res = f"Contact name: {self.name}, phones: {'; '.join(p.value for p in self.phones)}"
         res += f", email: {self.email}" if self.email else ""
         res += f", address: {self.address}" if self.address else ""
         res += f", birthday: {self.birthday}" if self.birthday else ""
         return res
 
 
-class AddressBook(UserDict):
+class AddressBook(UserDict[Name, Record]):
     def add_record(self, rec: Record):
         self.data[rec.name] = rec
 

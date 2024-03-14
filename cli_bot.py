@@ -24,34 +24,51 @@ def input_error(msg):
     return decorator
 
 @input_error("Give me name and phone please.")
-def add_contact(args, contacts):
+def add_contact(args, contacts: AddressBook):
     name, phone = args
     record = Record(name)
     record.add_phone(phone)
     contacts.add_record(record)
     return "Contact added."
 
-@input_error("Give me name and birthday please.")
-def add_birthday(args, contacts):
-    name, bd = args
-    rec = contacts.find(name)
-    rec.add_birthday(bd)
-    return "Birthday added."
-
 @input_error("Give me name and new phone please.")
-def change_contact(args, contacts):
+def change_contact(args, contacts: AddressBook):
     name, no = args
     rec = contacts.find(name)
     rec.change_phone(no)
     return "Contact updated."
 
+@input_error("Give me name and address please.")
+def add_address(args, contacts: AddressBook):
+    name = args[0]
+    # користувач може вводити адресу через пробіл 
+    # тому обєднуємо решту аргументів в одну строку
+    address = ' '.join(map(str, args[1:]))
+    rec = contacts.find(name)
+    rec.add_address(address)
+    return "Address added."
+
 @input_error("Give me name please.")
-def show_phone(args, contacts):
+def del_address(args, contacts: AddressBook):
+    name = args[0]
+    rec = contacts.find(name)
+    rec.remove_address()
+    return "Address deleted."
+
+@input_error("Give me name and birthday please.")
+def add_birthday(args, contacts: AddressBook):
+    name, bd = args
+    rec = contacts.find(name)
+    rec.add_birthday(bd)
+    return "Birthday added."
+
+@input_error("Give me name please.")
+def show_phone(args, contacts: AddressBook):
     name = args[0]
     return str(contacts.find(name))
 
 @input_error("Give me name please.")
-def show_birthday(args, contacts):
+def show_birthday(args, contacts: AddressBook):
     name = args[0]
     rec = contacts.find(name)
     if rec.birthday is None:
@@ -106,6 +123,14 @@ class PDP11Bot(cmd.Cmd):
     def do_show_birthday(self, arg):
         "Show birthday fo the contact"
         print(show_birthday(self.parse_input(arg), self.book))
+        
+    def do_add_address(self, arg):
+        "Add address for the contact"
+        print(add_address(self.parse_input(arg), self.book))
+        
+    def do_delete_address(self, arg):
+        "Delete the contact address"
+        print(del_address(self.parse_input(arg), self.book))
 
     # ---- preprocessors ----
     def preloop(self):
