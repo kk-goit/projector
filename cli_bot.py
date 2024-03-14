@@ -11,7 +11,7 @@ def input_error(msg):
         def inner(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except BookValueError as err:
+            except IncorrectFormatException as err:
                 return err
             except ValueError:
                 return msg 
