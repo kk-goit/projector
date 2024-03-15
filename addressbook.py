@@ -113,7 +113,8 @@ class Record:
             self.add_phone(phone)
 
     def __str__(self):
-        res = f"Contact name: {self.name}, phones: {'; '.join(p.value for p in self.phones)}"
+        res = f"Contact name: {self.name}"
+        res += f", phones: {'; '.join(p.value for p in self.phones)}" if len(self.phones) else ""
         res += f", email: {self.email}" if self.email else ""
         res += f", address: {self.address}" if self.address else ""
         res += f", birthday: {self.birthday}" if self.birthday else ""
@@ -127,7 +128,7 @@ class AddressBook(UserDict[Name, Record]):
     def get_all_contacts(self):
         contacts = list(self.data.values())
         if len(contacts) == 0:
-            raise IncorrectFormatException("No contacts in adress book")
+            raise IncorrectFormatException("No contacts in address book")
         else:
             return contacts    
 
@@ -168,7 +169,10 @@ class AddressBook(UserDict[Name, Record]):
         return res.rstrip()
             
     def __str__(self):
-        return "\n".join(map(str, self.get_all_contacts()))
+        if len(self.data):
+            return "\n".join(map(str, self.get_all_contacts()))
+        else:
+            return "No contacts in address book"
 
     def search(self, search_str: str):
         found_contacts = []

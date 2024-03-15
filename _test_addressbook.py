@@ -94,6 +94,39 @@ class TestAddressBook(unittest.TestCase):
         self.address_book.delete("John Doe")
         self.assertEqual(len(self.address_book), 0)
         
+    def test_str_empty_address_book(self):
+        expected_output = "No contacts in address book"
+        self.assertEqual(str(self.address_book), expected_output)
+        
+    def test_str_one_record(self):
+        self.address_book.add_record(self.record1)
+        expected_output = "Contact name: John Doe"
+        self.assertEqual(str(self.address_book), expected_output)
+        
+    def test_str_multiple_records(self):
+        self.address_book.add_record(self.record1)
+        self.address_book.add_record(self.record2)
+        expected_output = "Contact name: John Doe\nContact name: Jane Smith"
+        self.assertEqual(str(self.address_book), expected_output)
+        
+    def test_str_one_record_with_phone(self):
+        self.record1.add_phone("1234567890")
+        self.address_book.add_record(self.record1)
+        expected_output = "Contact name: John Doe, phones: 1234567890"
+        self.assertEqual(str(self.address_book), expected_output)
+        
+    def test_str_one_record_with_address(self):
+        self.record1.add_address("123 Main St")
+        self.address_book.add_record(self.record1)
+        expected_output = "Contact name: John Doe, address: 123 Main St"
+        self.assertEqual(str(self.address_book), expected_output)
+        
+    def test_str_one_record_with_email(self):
+        self.record1.add_email("john@example.com")
+        self.address_book.add_record(self.record1)
+        expected_output = "Contact name: John Doe, email: john@example.com"
+        self.assertEqual(str(self.address_book), expected_output)
+        
     # TODO implement
     def test_get_birthdays_per_week(self):
         pass
