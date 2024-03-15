@@ -23,13 +23,28 @@ def input_error(msg):
         return inner
     return decorator
 
+
 @input_error("Give me name and phone please.")
 def add_contact(args, contacts: AddressBook):
-    name, phone = args
+    name, phone, *optional_args = args
     record = Record(name)
     record.add_phone(phone)
+    
+    # Перевіряємо наявність опціональних аргументів та додаємо їх до запису
+    if optional_args:
+        if len(optional_args) >= 1:
+            email = optional_args[0]
+            record.add_email(email)
+        if len(optional_args) >= 2:
+            birthday = optional_args[1]
+            record.add_birthday(birthday)
+        if len(optional_args) >= 3:
+            address = ' '.join(map(str, optional_args[2:]))
+            record.add_address(address)
+            
     contacts.add_record(record)
     return "Contact added."
+
 
 @input_error("Give me name and new phone please.")
 def change_contact(args, contacts: AddressBook):
@@ -37,6 +52,36 @@ def change_contact(args, contacts: AddressBook):
     rec = contacts.find(name)
     rec.change_phone(no)
     return "Contact updated."
+
+@input_error("Give me name please.")
+def delete_contact(args, contacts: AddressBook):
+    name = args[0]
+    contacts.delete(name)
+    return "Contact deleted."
+
+
+@input_error("Give me name and phone to add please.")
+def add_phone(args, contacts: AddressBook):
+    name, phone = args
+    rec = contacts.find(name)
+    rec.add_phone(phone)
+    return f"New phone added to {name}"
+
+@input_error("Give me name, old phone, and new phone please.")
+def change_phone(args, contacts: AddressBook):
+    name, old_phone, new_phone = args
+    rec = contacts.find(name)
+    rec.edit_phone(old_phone, new_phone)
+    return f"Phone for {name} changed from {old_phone} to {new_phone}"
+
+
+@input_error("Give me name and phone to delete please.")
+def del_phone(args, contacts: AddressBook):
+    name, phone = args
+    rec = contacts.find(name)
+    rec.remove_phone(phone)
+    return f"Phone {phone} deleted from the contact {name}"
+
 
 @input_error("Give me name and address please.")
 def add_address(args, contacts: AddressBook):
@@ -48,12 +93,14 @@ def add_address(args, contacts: AddressBook):
     rec.add_address(address)
     return "Address added."
 
+
 @input_error("Give me name please.")
 def del_address(args, contacts: AddressBook):
     name = args[0]
     rec = contacts.find(name)
     rec.remove_address()
     return "Address deleted."
+
 
 @input_error("Give me name and birthday please.")
 def add_birthday(args, contacts: AddressBook):
@@ -63,9 +110,11 @@ def add_birthday(args, contacts: AddressBook):
     return "Birthday added."
 
 @input_error("Give me name please.")
-def show_phone(args, contacts: AddressBook):
+def del_birthday(args, contacts: AddressBook):
     name = args[0]
-    return str(contacts.find(name))
+    rec = contacts.find(name)
+    rec.remove_birthday()
+    return f"Birthday deleted from the contact {name}"
 
 @input_error("Give me name please.")
 def show_birthday(args, contacts: AddressBook):
@@ -74,6 +123,27 @@ def show_birthday(args, contacts: AddressBook):
     if rec.birthday is None:
         return "Birthday don't setted."
     return f"{name}'s birthday is {rec.birthday}"
+
+@input_error("Give me name and email please.")
+def add_email(args, contacts: AddressBook):
+    name, email = args
+    rec = contacts.find(name)
+    rec.add_email(email)
+    return "Email added."
+
+@input_error("Give me name please.")
+def del_email(args, contacts: AddressBook):
+    name = args[0]
+    rec = contacts.find(name)
+    rec.remove_email()
+    return f"Email deleted from the contact {name}"
+
+@input_error("Give me name please.")
+def show_phone(args, contacts: AddressBook):
+    name = args[0]
+    return str(contacts.find(name))
+
+
 
 @input_error("Give me argument for search.")
 def search(args, contacts: AddressBook):
@@ -105,12 +175,28 @@ class PDP11Bot(cmd.Cmd):
         return self.do_exit(arg)
     
     def do_add(self, arg):
-        "Adding new contact with phone"
+        "Adding new contact with phone, email, birthday and address"
         print(add_contact(self.parse_input(arg), self.book))
 
     def do_change(self, arg):
         "Change the contact phone"
         print(change_contact(self.parse_input(arg), self.book))
+        
+    def do_delete(self, arg):
+        "Delete contact"
+        print(delete_contact(self.parse_input(arg), self.book))
+        
+    def do_add_phone(self, arg):
+        "Add phone to the contact"
+        print(add_phone(self.parse_input(arg), self.book))
+        
+    def do_change_phone(self, arg):
+        "Change phone for the contact"
+        print(change_phone(self.parse_input(arg), self.book))
+    
+    def do_delete_phone(self, arg):
+        "Delete phone from the contact"
+        print(del_phone(self.parse_input(arg), self.book))
 
     def do_phone(self, arg):
         "Show contacts phones"
@@ -127,18 +213,30 @@ class PDP11Bot(cmd.Cmd):
     def do_add_birthday(self, arg):
         "Add/Change birthday for the contact"
         print(add_birthday(self.parse_input(arg), self.book))
+    
+    def do_delete_birthday(self, arg):
+        "Delete birthday from the contact"
+        print(del_birthday(self.parse_input(arg), self.book))
 
     def do_show_birthday(self, arg):
         "Show birthday fo the contact"
         print(show_birthday(self.parse_input(arg), self.book))
         
     def do_add_address(self, arg):
-        "Add address for the contact"
+        "Add address to the contact"
         print(add_address(self.parse_input(arg), self.book))
         
     def do_delete_address(self, arg):
-        "Delete the contact address"
+        "Delete address from the contact"
         print(del_address(self.parse_input(arg), self.book))
+        
+    def do_add_email(self, arg):
+        "Add email to the contact"
+        print(add_email(self.parse_input(arg), self.book))
+        
+    def do_delete_email(self, arg):
+        "Delete email from the contact"
+        print(del_email(self.parse_input(arg), self.book))
 
     def do_search(self, arg):
         "Search data in contacts"
