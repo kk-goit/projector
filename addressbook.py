@@ -120,7 +120,8 @@ class Record:
             self.add_phone(phone)
 
     def __str__(self):
-        res = f"Contact name: {self.name}, phones: {'; '.join(p.value for p in self.phones)}"
+        res = f"Contact name: {self.name}"
+        res += f", phones: {'; '.join(p.value for p in self.phones)}" if len(self.phones) else ""
         res += f", email: {self.email}" if self.email else ""
         res += f", address: {self.address}" if self.address else ""
         res += f", birthday: {self.birthday}" if self.birthday else ""
@@ -219,6 +220,13 @@ class AddressBook(UserDict[Name, Record]):
 
         return note
 
+    def get_all_contacts(self):
+        contacts = list(self.data.values())
+        if len(contacts) == 0:
+            raise IncorrectFormatException("No contacts in address book")
+        else:
+            return contacts    
+
     def find(self, name: str):
         rec = self.data.get(name)
         if rec is None:
@@ -234,10 +242,10 @@ class AddressBook(UserDict[Name, Record]):
         cur_year = datetime.today().year
         cur_date = datetime.today().date()
         cur_week_day = cur_date.weekday()
-        for rec in self.data.values():
+        for rec in self.get_all_contacts():
             if rec.birthday is None:
                 continue
-            birthday = rec.birthday.birthdate.date().replace(year=cur_year)
+            birthday = rec.birthday.value.date().replace(year=cur_year)
             if birthday < cur_date:
                 birthday = birthday.replace(year=birthday.year+1)
             delta_days = (birthday - cur_date).days
@@ -254,6 +262,32 @@ class AddressBook(UserDict[Name, Record]):
         for day in week_birthdays.keys():
             res += "{}: {}\n".format(day, ", ".join(week_birthdays[day]))
         return res.rstrip()
-
+            
     def __str__(self):
-        return "\n".join(map(str, self.data.values()))
+        if len(self.data):
+            return "\n".join(map(str, self.get_all_contacts()))
+        else:
+            return "No contacts in address book"
+
+    def search(self, search_str: str):
+        found_contacts = []
+
+        for rec in self.get_all_contacts():
+            user_info = str(rec.name)
+            if rec.phones:
+                user_info += ", " + ", ".join(str(phone) for phone in rec.phones)
+            if rec.birthday is not None:
+                user_info += ", " + str(rec.birthday)
+            if rec.email is not None:
+                user_info += ", " + str(rec.email)
+            if rec.address is not None:
+                 user_info += ", " + str(rec.address)      
+            
+            if search_str.lower() in user_info.lower():
+                found_contacts.append(rec)
+
+        if not found_contacts:
+            raise IncorrectFormatException("No contacts found")        
+
+        return found_contacts    
+    
