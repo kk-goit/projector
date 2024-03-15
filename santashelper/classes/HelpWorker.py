@@ -1,4 +1,4 @@
-from classes.AddressBook import *
+from .AddressBook import *
 
 def input_error(msg):
     "Inclosed exceptions decorator"

@@ -1,20 +1,22 @@
 import pickle, cmd
-from classes.HelpWorker import *
-from classes.AddressBook import *
+from pathlib import Path
+
+from .HelpWorker import *
+from .AddressBook import *
 
 class SantasHelper(cmd.Cmd):
-    intro = "Welcome to the Santa's Helper!\n"
+    intro = ""
     prompt = "(elf) "
     doc_header = "My commands (type help <topic> for more info):"
 
-    fn = "address-book.dmp"
+    fn = "santas-book.dmp"
     book = AddressBook()
     worker = HelpWorker()
 
     # ---- commands ----
     def do_hello(self, arg):
         "Greeting command"
-        print("How can I help you?")
+        print("I'm Santa's Helper, how can I help you?")
         self.do_help(None)
 
     def do_exit(self, arg):
@@ -139,6 +141,7 @@ class SantasHelper(cmd.Cmd):
     def preloop(self):
         "Init data before starting command prompt loop"
         self.open_address_book()
+        self.do_hello(None)
 
     def precmd(self, line: str) -> str:
         "Lowering entered commands"
@@ -156,14 +159,14 @@ class SantasHelper(cmd.Cmd):
         "Loading the adress book from file if exists"
         self.book = AddressBook()
         try:
-            with open(self.fn, "rb") as file:
+            with open(Path.home() / self.fn, "rb") as file:
                 self.book = pickle.load(file)
         except FileNotFoundError:
             pass
 
     def save_book(self):
         "Dump AdressBook to file"
-        with open(self.fn, "wb") as fh:
+        with open(Path.home() / self.fn, "wb") as fh:
             pickle.dump(self.book, fh)
 
     def parse_input(self, arg: str):

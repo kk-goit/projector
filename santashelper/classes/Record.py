@@ -1,5 +1,5 @@
 from collections import UserDict, defaultdict
-from classes.Fields import *
+from .Fields import *
 
 class Record:
     def __init__(self, name):

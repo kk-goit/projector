@@ -1,5 +1,5 @@
-from classes.Record import *
-from classes.Notes import *
+from .Record import *
+from .Notes import *
 
 class AddressBook(UserDict[Name, Record]):
     def __init__(self):

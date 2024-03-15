@@ -1,5 +1,5 @@
 from collections import UserDict, defaultdict
-from classes.Fields import *
+from .Fields import *
 
 class Notes(UserDict[int, Note]):
     def __init__(self):
