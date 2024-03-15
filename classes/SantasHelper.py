@@ -52,6 +52,10 @@ class SantasHelper(cmd.Cmd):
         print(self.worker.change_phone(self.parse_input(arg), self.book))
         self.save_book()
 
+    def do_show(self, arg):
+        "Show contact from address book"
+        print(self.worker.show(self.parse_input(arg), self.book))
+
     def do_delete_phone(self, arg):
         "Delete phone from the contact"
         print(self.worker.del_phone(self.parse_input(arg), self.book))
@@ -158,7 +162,7 @@ class SantasHelper(cmd.Cmd):
         try:
             with open(self.fn, "rb") as file:
                 self.book = pickle.load(file)
-        except FileNotFoundError:
+        except (FileNotFoundError, ModuleNotFoundError):
             pass
 
     def save_book(self):

@@ -51,7 +51,11 @@ class HelpWorker:
         name = args[0]
         contacts.delete(name)
         return "Contact deleted."
-
+    
+    @input_error("Contact not found.")
+    def show(self, args, contacts: AddressBook):
+        name = args[0]
+        return contacts.find(name)
 
     @input_error("Give me name and phone to add please.")
     def add_phone(self, args, contacts: AddressBook):
