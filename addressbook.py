@@ -7,7 +7,11 @@ class IncorrectFormatException(Exception):
     pass
 
 
-class IncorrectNoteIndexErr(Exception):
+class IncorrectNoteIndexError(Exception):
+    pass
+
+class NotesNotFoundError(Exception):
+    """Exception raised when notes are not found."""
     pass
 
 
@@ -46,7 +50,7 @@ class Email(Field):
         self.validate(value)
         super().__init__(value)
 
-    def validate(self, value: str): 
+    def validate(self, value: str):
         pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(pattern, value):
             raise IncorrectFormatException('Incorrect email format')
@@ -129,103 +133,90 @@ class Record:
 
 
 class Note(Field):
-    def __init__(self, value: str, index: int):
-        super().__init__(value)
-        self.index = index
-
     def __shorten_value(self) -> str:
-        ch_lim = 30
+        ch_lim = 60
         if len(self.value) <= ch_lim:
             return self.value
         else:
             return self.value[:ch_lim - 3] + '...'
 
-    def get_index(self) -> int:
-        return self.index
-
     def get_preview(self) -> str:
         return self.__shorten_value()
 
 
-class Notes():
+class Notes(UserDict[int, Note]):
     def __init__(self):
-        self.data: list[Note] = []
+        super().__init__()
+        self.max_index = 0
 
     def __get_by_index(self, index: str) -> Note:
+        if self.data.get(self.__parse_index(index)):
+            return self.data.get(index)
+
+        raise KeyError(f"There is no note with an index {index}")
+
+    def __parse_index(self, index: str) -> int:
         try:
             index = int(index)
             if index > 0:
-                for note in self.data:
-                    if note.get_index() == index:
-                        return note
-                raise KeyError(f"There is no note with an index {index}")
+                return index
             else:
-                raise IncorrectNoteIndexErr("Index can't be < 1.")
+                raise IncorrectNoteIndexError("Index can't be < 1.")
         except ValueError:
-            raise IncorrectNoteIndexErr("Index should be an integer.")
-
+            raise IncorrectNoteIndexError("Index should be an integer.")
 
     def add(self, note: Note):
-        self.data.append(note)
+        self.data[self.max_index + 1] = note
+        self.max_index += 1
+        return self.max_index
 
-    def delete(self, index: int):
-        note_to_del = self.__get_by_index(index)
-        for i, note in enumerate(self.data):
-            if note == note_to_del:
-                del self.data[i]
+    def delete(self, index: str):
+        del self.data[self.__parse_index(index)]
 
-    def get_last_index(self) -> int:
-        max_index = 0
-        for note in self.data:
-            note_index = note.get_index()
-            if note_index > max_index:
-                max_index = note_index
-
-        return max_index
-
-    def list(self, data: list[Note] = None):
-        data = data if data else self.data
+    def list(self, data: dict[int, Note] = None):
+        data = self.data if data is None else data
         if len(data) > 0:
             listed = ""
-            for note in data:
-                listed += f"{note.get_index()} - {note.get_preview()}\n"
+            for index, note in data.items():
+                listed += f"{index} - {note.get_preview()}\n"
             return listed
         else:
-            print("Unable to locate any notes.")  # TODO; make it better for search
+            raise NotesNotFoundError("Unable to locate any notes.")  # TODO; make it better for search
 
     def search(self, substr: str):
-        matched: list[Note] = []
-        for note in self.data:
+        matched: dict[int, Note] = {}
+        for index, note in self.data.items():
             if substr in str(note):
-                matched.append(note)
+                matched[index] = note
 
         return self.list(matched)
 
     def show(self, index: str):
         return str(self.__get_by_index(index))
 
+    def change_note(self, index: str, new_text: str):
+        if new_text == '':
+            raise IncorrectFormatException("Note can't be empty")
+        self.data[self.__parse_index(index)] = Note(new_text)
+
 
 class AddressBook(UserDict[Name, Record]):
-    def __init__(self, initial_data=None):
-        super().__init__(initial_data)
+    def __init__(self):
+        super().__init__()
         self.notes = Notes()
 
     def add_record(self, rec: Record):
         self.data[rec.name] = rec
 
     def add_note(self, text: str):
-        note_index = self.notes.get_last_index() + 1
-        note = Note(text, note_index)
-        self.notes.add(note)
-
-        return note
+        return self.notes.add(Note(text))
 
     def get_all_contacts(self):
         contacts = list(self.data.values())
         if len(contacts) == 0:
             raise IncorrectFormatException("No contacts in address book")
         else:
-            return contacts    
+            return contacts
 
     def find(self, name: str):
         rec = self.data.get(name)
@@ -262,7 +253,7 @@ class AddressBook(UserDict[Name, Record]):
         for day in week_birthdays.keys():
             res += "{}: {}\n".format(day, ", ".join(week_birthdays[day]))
         return res.rstrip()
-            
+
     def __str__(self):
         if len(self.data):
             return "\n".join(map(str, self.get_all_contacts()))
@@ -281,13 +272,12 @@ class AddressBook(UserDict[Name, Record]):
             if rec.email is not None:
                 user_info += ", " + str(rec.email)
             if rec.address is not None:
-                 user_info += ", " + str(rec.address)      
-            
+                user_info += ", " + str(rec.address)
+
             if search_str.lower() in user_info.lower():
                 found_contacts.append(rec)
 
         if not found_contacts:
-            raise IncorrectFormatException("No contacts found")        
+            raise IncorrectFormatException("No contacts found")
 
-        return found_contacts    
-    
+        return found_contacts

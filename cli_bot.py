@@ -13,15 +13,12 @@ def input_error(msg):
         def inner(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except IncorrectFormatException as err:
-                return err
-            except ValueError:
+            except (ValueError, IndexError):
                 return msg
-            except IndexError:
-                return msg
-            except KeyError as err:
-                return err
-            except IncorrectNoteIndexErr as err:
+            except (IncorrectFormatException,
+                    IncorrectNoteIndexError,
+                    NotesNotFoundError,
+                    KeyError) as err:
                 return err
 
         return inner
@@ -32,7 +29,7 @@ def input_error(msg):
 def add_contact(args, contacts: AddressBook):
     name, info = args
     record = Record(name)
-    
+
     try:
         record.add_phone(info)
     except IncorrectFormatException:
@@ -43,7 +40,7 @@ def add_contact(args, contacts: AddressBook):
                 record.add_birthday(info)
             except IncorrectFormatException:
                 raise IncorrectFormatException(f"{info} is not a phone number, email or birthday")
-            
+
     contacts.add_record(record)
     return "Contact added."
 
@@ -88,7 +85,7 @@ def del_phone(args, contacts: AddressBook):
 @input_error("Give me name and address please.")
 def add_address(args, contacts: AddressBook):
     name = args[0]
-    # користувач може вводити адресу через пробіл 
+    # користувач може вводити адресу через пробіл
     # тому обєднуємо решту аргументів в одну строку
     address = ' '.join(map(str, args[1:]))
     rec = contacts.find(name)
@@ -124,6 +121,7 @@ def del_birthday(args, contacts: AddressBook):
     rec = contacts.find(name)
     rec.remove_birthday()
     return f"Birthday deleted from the contact {name}"
+
 
 @input_error("")
 def get_birthdays_per_week(contacts: AddressBook):
@@ -188,18 +186,18 @@ def search(args, contacts: AddressBook):
     search_arg = args[0]
     if len(search_arg) < 3:
         return "Search string must be at least 3 characters long."
-    result = contacts.search(search_arg) 
+    result = contacts.search(search_arg)
     return '\n'.join([str(rec) for rec in result])
 
 
 @input_error("")
 def add_note(book: AddressBook):
     text = input('Note text:')
-    note = book.add_note(text)
-    return f"Added note with index {note.get_index()}"
+    index = book.add_note(text)
+    return f"Added note with index {index}"
 
 
-@input_error("")
+@input_error("Give me note index please.")
 def show_note(args, book: AddressBook):
     index = args[0]
     return book.notes.show(index)
@@ -210,17 +208,25 @@ def show_notes(args, book: AddressBook):
     return book.notes.list()
 
 
-@input_error("")
+@input_error("Give text to search please.")
 def search_notes(args, book: AddressBook):
     search_str = args[0]
     return book.notes.search(search_str)
 
 
-@input_error("")
+@input_error("Give me note index please.")
 def del_note(args, book: AddressBook):
     index = args[0]
     book.notes.delete(index)
     return f"Note with index {index} deleted"
+
+
+@input_error("Give me note index please.")
+def change_note(args, book: AddressBook):
+    index = args[0]
+    new_text = input('Enter a new text: ')
+    book.notes.change_note(index, new_text)
+    return f"Note with index {index} changed"
 
 
 class PDP11Bot(cmd.Cmd):
@@ -236,41 +242,48 @@ class PDP11Bot(cmd.Cmd):
 
     def do_exit(self, arg):
         "Stop work and good bye"
+        self.save_book()
         print("Good bye!")
-        self.close_book()
         return True
 
     def do_close(self, arg):
         "Stop work and good bye"
         return self.do_exit(arg)
-    
+
     def do_delete(self, arg):
         "Delete the contact"
         print(del_contact(self.parse_input(arg), self.book))
-    
+        self.save_book()
+
     def do_add(self, arg):
         "Adding new contact with phone, email, birthday and address"
         print(add_contact(self.parse_input(arg), self.book))
+        self.save_book()
 
     def do_change(self, arg):
         "Change the contact phone"
         print(change_contact(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_delete(self, arg):
         "Delete contact"
         print(delete_contact(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_add_phone(self, arg):
         "Add phone to the contact"
         print(add_phone(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_change_phone(self, arg):
         "Change phone for the contact"
         print(change_phone(self.parse_input(arg), self.book))
-    
+        self.save_book()
+
     def do_delete_phone(self, arg):
         "Delete phone from the contact"
         print(del_phone(self.parse_input(arg), self.book))
+        self.save_book()
 
     def do_phone(self, arg):
         "Show contacts phones"
@@ -287,10 +300,12 @@ class PDP11Bot(cmd.Cmd):
     def do_add_birthday(self, arg):
         "Add/Change birthday for the contact"
         print(add_birthday(self.parse_input(arg), self.book))
-    
+        self.save_book()
+
     def do_delete_birthday(self, arg):
         "Delete birthday from the contact"
         print(del_birthday(self.parse_input(arg), self.book))
+        self.save_book()
 
     def do_show_birthday(self, arg):
         "Show birthday fo the contact"
@@ -299,29 +314,32 @@ class PDP11Bot(cmd.Cmd):
     def do_add_address(self, arg):
         "Add address to the contact"
         print(add_address(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_delete_address(self, arg):
         "Delete address from the contact"
         print(del_address(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_add_email(self, arg):
         "Add email to the contact"
         print(add_email(self.parse_input(arg), self.book))
-        
+        self.save_book()
+
     def do_delete_email(self, arg):
         "Delete email from the contact"
         print(del_email(self.parse_input(arg), self.book))
+        self.save_book()
 
     def do_search(self, arg):
         "Search data in contacts"
-        print(search(self.parse_input(arg), self.book))    
+        print(search(self.parse_input(arg), self.book))
 
     # ---- note commands ----
     def do_add_note(self, arg):
+        "Adds a new note"
         print(add_note(self.book))
-
-    def help_add_note(self):
-        print("Adds a new note")
+        self.save_book()
 
     def do_show_note(self, arg):
         "Shows note by provided index"
@@ -335,9 +353,15 @@ class PDP11Bot(cmd.Cmd):
         "Searches for a note which contains a certain string"
         print(search_notes(self.parse_input(arg), self.book))
 
-    def do_del_note(self, arg):
+    def do_delete_note(self, arg):
         "Deletes note by provided index"
         print(del_note(self.parse_input(arg), self.book))
+        self.save_book()
+
+    def do_change_note(self, arg):
+        "Changes note by provided index"
+        print(change_note(self.parse_input(arg), self.book))
+        self.save_book()
 
     # ---- preprocessors ----
     def preloop(self):
@@ -350,11 +374,11 @@ class PDP11Bot(cmd.Cmd):
         if len(words) > 0:
             words[0] = words[0].lower()
         return super().precmd(' '.join(words))
-    
+
     def completenames(self, text: str, *ignored) -> list[str]:
         "Lowering inputed command's chars"
         return super().completenames(text.lower(), *ignored)
-    
+
     # ---- internal logic ----
     def open_address_book(self):
         "Loading the adress book from file if exists"
@@ -365,7 +389,7 @@ class PDP11Bot(cmd.Cmd):
         except FileNotFoundError:
             pass
 
-    def close_book(self):
+    def save_book(self):
         "Dump AdressBook to file"
         with open(self.fn, "wb") as fh:
             pickle.dump(self.book, fh)
