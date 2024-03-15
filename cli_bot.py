@@ -114,7 +114,7 @@ class PDP11Bot(cmd.Cmd):
     intro = "Welcome to the assistant bot!\n"
     prompt = "(pdp-11) "
     fn = "address-book.dmp"
-    book = AddressBook()
+    book = None
 
     # ---- commands ----
     def do_hello(self, arg):
@@ -177,8 +177,8 @@ class PDP11Bot(cmd.Cmd):
 
     # ---- preprocessors ----
     def preloop(self):
-        with open(self.fn, "rb") as fh:
-            self.book = pickle.load(fh)
+        "Init data before starting command prompt loop"
+        self.open_address_book()
 
     def precmd(self, line: str) -> str:
         "Lowering entered commands"
@@ -192,6 +192,15 @@ class PDP11Bot(cmd.Cmd):
         return super().completenames(text.lower(), *ignored)
     
     # ---- internal logic ----
+    def open_address_book(self):
+        "Loading the adress book from file if exists"
+        self.book = AddressBook()
+        try:
+            with open(self.fn, "rb") as file:
+                self.book = pickle.load(file)
+        except FileNotFoundError:
+            pass
+
     def close_book(self):
         "Dump AdressBook to file"
         with open(self.fn, "wb") as fh:
