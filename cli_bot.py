@@ -99,6 +99,11 @@ def del_address(args, contacts: AddressBook):
     rec.remove_address()
     return "Address deleted."
 
+@input_error("No such name in the address book.")
+def del_contact(args, contacts: AddressBook):
+    name = args[0]
+    contacts.delete(name)
+    return "Contact deleted."
 
 @input_error("Give me name and birthday please.")
 def add_birthday(args, contacts: AddressBook):
@@ -107,12 +112,40 @@ def add_birthday(args, contacts: AddressBook):
     rec.add_birthday(bd)
     return "Birthday added."
 
+
 @input_error("Give me name please.")
 def del_birthday(args, contacts: AddressBook):
     name = args[0]
     rec = contacts.find(name)
     rec.remove_birthday()
     return f"Birthday deleted from the contact {name}"
+
+
+def print_all(contacts: AddressBook):
+    chunk_size=5
+    items = list(contacts.values())
+    total_items = len(items)
+    if not total_items:
+        return "Address book is empty."
+    start_index = 0
+
+    while start_index < total_items:
+        end_index = min(start_index + chunk_size, total_items)
+        current_chunk = items[start_index:end_index]
+
+        for value in current_chunk:
+            print(value)
+
+        if end_index < total_items:
+            input("Press Enter to continue...")
+
+        start_index = end_index
+    return "End of addres book"
+
+@input_error("Give me name please.")
+def show_phone(args, contacts: AddressBook):
+    name = args[0]
+    return str(contacts.find(name))
 
 @input_error("Give me name please.")
 def show_birthday(args, contacts: AddressBook):
@@ -172,6 +205,10 @@ class PDP11Bot(cmd.Cmd):
         "Stop work and good bye"
         return self.do_exit(arg)
     
+    def do_delete(self, arg):
+        "Delete the contact"
+        print(del_contact(self.parse_input(arg), self.book))
+    
     def do_add(self, arg):
         "Adding new contact with phone, email, birthday and address"
         print(add_contact(self.parse_input(arg), self.book))
@@ -202,7 +239,7 @@ class PDP11Bot(cmd.Cmd):
 
     def do_all(self, arg):
         "Print the address book"
-        print(self.book)
+        print(print_all(self.book))
 
     def do_birthdays(self, arg):
         "Print birthday on the next week"
