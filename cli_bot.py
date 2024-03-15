@@ -24,23 +24,21 @@ def input_error(msg):
     return decorator
 
 
-@input_error("Give me name and phone please.")
+@input_error("Give me name and info please.")
 def add_contact(args, contacts: AddressBook):
-    name, phone, *optional_args = args
+    name, info = args
     record = Record(name)
-    record.add_phone(phone)
     
-    # Перевіряємо наявність опціональних аргументів та додаємо їх до запису
-    if optional_args:
-        if len(optional_args) >= 1:
-            email = optional_args[0]
-            record.add_email(email)
-        if len(optional_args) >= 2:
-            birthday = optional_args[1]
-            record.add_birthday(birthday)
-        if len(optional_args) >= 3:
-            address = ' '.join(map(str, optional_args[2:]))
-            record.add_address(address)
+    try:
+        record.add_phone(info)
+    except IncorrectFormatException:
+        try: 
+            record.add_email(info)
+        except IncorrectFormatException:
+            try:
+                record.add_birthday(info)
+            except IncorrectFormatException:
+                raise IncorrectFormatException(f"{info} is not a phone number, email or birthday")
             
     contacts.add_record(record)
     return "Contact added."
