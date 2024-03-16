@@ -216,4 +216,19 @@ class HelpWorker:
         book.notes.change_note(index, new_text)
         return f"Note with index {index} changed"
 
-
+    @input_error("Give me note index and tag please.")
+    def add_tag(self, args, book: AddressBook):
+        index, tag = args
+        book.notes.add_tag(index, tag)
+        return f"Tag {tag} added to note with index {index}"
+    
+    @input_error("Give me note index and tag please.")
+    def del_tag(self, args, book: AddressBook):
+        index, tag = args
+        book.notes.del_tag(index, tag)
+        return f"Tag {tag} deleted from note with index {index}"
+    
+    @input_error("Give me tag(s) please.")
+    def get_taged_notes(self, args, book: AddressBook):
+        tags = set(args)
+        return book.notes.get_taged(tags)

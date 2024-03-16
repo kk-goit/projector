@@ -7,8 +7,9 @@ class Notes(UserDict[int, Note]):
         self.max_index = 0
 
     def __get_by_index(self, index: str) -> Note:
-        if self.data.get(self.__parse_index(index)):
-            return self.data.get(index)
+        idx = self.__parse_index(index)
+        if self.data.get(idx):
+            return self.data.get(idx)
 
         raise KeyError(f"There is no note with an index {index}")
 
@@ -56,4 +57,18 @@ class Notes(UserDict[int, Note]):
             raise IncorrectFormatException("Note can't be empty")
         self.data[self.__parse_index(index)] = Note(new_text)
         
-        
+    def add_tag(self, index: str, tag: str):
+        self.__get_by_index(index).tags.add(tag)
+
+    def del_tag(self, index: str, tag: str):
+        self.__get_by_index(index).tags.discard(tag)
+
+    def get_taged(self, tags: set):
+        if len(tags) == 0:
+            raise ValueError("Empty tags")
+        matched: dict[int, Note] = {}
+        for index, note in self.data.items():
+            if len(tags & note.tags):
+                matched[index] = note
+
+        return self.list(matched)

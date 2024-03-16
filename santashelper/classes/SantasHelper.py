@@ -137,6 +137,18 @@ class SantasHelper(cmd.Cmd):
         print(self.worker.change_note(self.parse_input(arg), self.book))
         self.save_book()
 
+    def do_add_note_tag(self, arg):
+        "Add a tag to the note by provided index"
+        print(self.worker.add_tag(self.parse_input(arg), self.book))
+
+    def do_delete_note_tag(self, arg):
+        "Delete a tag from the note by provided index"
+        print(self.worker.del_tag(self.parse_input(arg), self.book))
+
+    def do_show_notes_with_tags(self, arg):
+        "Show notes that are taged by provided tags"
+        print(self.worker.get_taged_notes(self.parse_input(arg), self.book))
+
     # ---- preprocessors ----
     def preloop(self):
         "Init data before starting command prompt loop"
