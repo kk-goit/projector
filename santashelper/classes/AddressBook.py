@@ -15,7 +15,7 @@ class AddressBook(UserDict[Name, Record]):
     def get_all_contacts(self):
         contacts = list(self.data.values())
         if len(contacts) == 0:
-            raise IncorrectFormatException("No contacts in address book")
+            raise KeyError("No contacts in address book")
         else:
             return contacts
 
@@ -26,7 +26,10 @@ class AddressBook(UserDict[Name, Record]):
         return rec
 
     def delete(self, name: str):
-        self.data.pop(name)
+        try:
+            self.data.pop(name)
+        except KeyError:
+            raise KeyError(f"Contact with name {name} not found")
 
     def get_birthdays_per_week(self):
         week_birthdays = defaultdict(list)

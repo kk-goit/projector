@@ -7,7 +7,7 @@ The application has its own command interface, because Santa is used to it.
 
 ## Installation
 
-```
+```console
 pip install santashelper
 ```
 
@@ -17,4 +17,9 @@ pip install santashelper
 * Type a commands
 * To close the application - type command 'exit'
 
+
+## To run test
+```console
+python -m unittest
+```
 
