@@ -73,6 +73,10 @@ class Birthday(Field):
     
         
 class Note(Field):
+    def __init__(self, value: str):
+        super().__init__(value)
+        self.tags = set()
+
     def __shorten_value(self) -> str:
         ch_lim = 60
         if len(self.value) <= ch_lim:
@@ -81,5 +85,13 @@ class Note(Field):
             return self.value[:ch_lim - 3] + '...'
 
     def get_preview(self) -> str:
-        return self.__shorten_value()
-        
+        ret = self.__shorten_value()
+        if len(self.tags) > 0:
+            ret += "; tags: " + ", ".join(self.tags)
+        return ret
+    
+    def __str__(self):
+        ret = super().__str__()
+        if len(self.tags) > 0:
+            ret += "\ntags: " + ", ".join(self.tags)
+        return ret
