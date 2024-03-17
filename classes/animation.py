@@ -1,5 +1,5 @@
 from __future__ import division
-from asciimatics.effects import Print, Cycle, Stars, Snow
+from asciimatics.effects import Print, Cycle, Stars
 from asciimatics.renderers import ColourImageFile, FigletText
 from asciimatics.scene import Scene
 from asciimatics.screen import Screen
