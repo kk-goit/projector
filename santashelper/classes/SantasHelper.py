@@ -59,17 +59,17 @@ class SantasHelper(cmd.Cmd):
         print(self.worker.del_phone(self.parse_input(arg), self.book))
         self.save_book()
 
-    def do_phone(self, arg):
-        "Show contacts phones"
-        print(self.worker.show_phone(self.parse_input(arg), self.book))
+    def do_show(self, arg):
+        "Show contact"
+        print(self.worker.show_contact(self.parse_input(arg), self.book))
 
     def do_list_children(self, arg):
         "Print the list of children"
         print(self.worker.print_all(self.book))
 
-    def do_birthdays(self, *arg):
-        "Print birthday on the next week"
-        print(self.worker.get_birthdays_per_week(arg, self.book))
+    def do_birthdays(self, arg):
+        "Print birthday for next days"
+        print(self.worker.get_birthdays_per_days(self.parse_input(arg), self.book))
 
     def do_add_birthday(self, arg):
         "Add/Change birthday for the contact"
@@ -112,7 +112,7 @@ class SantasHelper(cmd.Cmd):
     # ---- note commands ----
     def do_add_note(self, arg):
         "Adds a new note"
-        print(self.worker.add_note(self.book))
+        print(self.worker.add_note(self.parse_input(arg), self.book))
         self.save_book()
 
     def do_show_note(self, arg):
@@ -177,6 +177,50 @@ class SantasHelper(cmd.Cmd):
     def completenames(self, text: str, *ignored) -> list[str]:
         "Lowering inputed command's chars"
         return super().completenames(text.lower(), *ignored)
+
+    # ---- competitions ----
+    def __auto_complete_contact_name(self, line: str):
+        "Complete contact names"
+        if len(line.split()) > 1:
+            # second level not supported
+            return []
+        part = line.lower()
+        if len(part) == 0:
+            return self.book.get_contact_names()
+        names = list()   
+        for name in self.book.get_contact_names():
+            if name.lower().startswith(part):
+                names.append(name)
+        return names
+    
+    def complete_show(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_address(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_email(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_wishlist_items(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_change_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_address(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_child(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_email(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_show_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_show_wishlist(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
 
     # ---- internal logic ----
     def open_address_book(self):
