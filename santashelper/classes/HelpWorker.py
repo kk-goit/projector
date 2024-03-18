@@ -252,4 +252,4 @@ class HelpWorker:
         name = args[0]
         contact = book.find(name)
         contact.generate_wishlist(name)    
-        return f"Generated wishlist items for child " + name  
+        return f"Generated wishlist for child " + name  

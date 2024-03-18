@@ -64,7 +64,7 @@ class Record:
         return ', '.join([str(item) for item in self.wishlist])
 
     def generate_wishlist(self, name):
-        if self.wishlist:
+        if len(self.wishlist) > 0:
             raise IncorrectFormatException("Wishlist is already exist")
         top_10_items = ['iPhone', 'Nike Air Force', 'Watch', 'Lego', 'Barbie doll', 'PS5', 'Drone', 
         'Disney Toy', 'Bike', 'Board Game']
