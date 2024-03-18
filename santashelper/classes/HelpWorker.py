@@ -14,6 +14,7 @@ def input_error(msg):
                 IncorrectFormatException,
                 IncorrectNoteIndexError,
                 NotesNotFoundError,
+                NotFoundError,
                 KeyError,
             ) as err:
                 return err
