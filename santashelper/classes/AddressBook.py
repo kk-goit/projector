@@ -12,6 +12,8 @@ class AddressBook(UserDict[Name, Record]):
         self.notes = Notes()
 
     def add_record(self, rec: Record):
+        if str(rec.name) in self.data.keys():
+            raise KeyError(f"Child with name {rec.name} exists")
         self.data[str(rec.name)] = rec
 
     def add_note(self, text: str):
