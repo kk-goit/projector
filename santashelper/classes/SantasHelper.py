@@ -59,17 +59,17 @@ class SantasHelper(cmd.Cmd):
         print(self.worker.del_phone(self.parse_input(arg), self.book))
         self.save_book()
 
-    def do_phone(self, arg):
-        "Show contacts phones"
-        print(self.worker.show_phone(self.parse_input(arg), self.book))
+    def do_show(self, arg):
+        "Show contact"
+        print(self.worker.show_contact(self.parse_input(arg), self.book))
 
     def do_list_children(self, arg):
         "Print the list of children"
         print(self.worker.print_all(self.book))
 
-    def do_birthdays(self, *arg):
-        "Print birthday on the next week"
-        print(self.worker.get_birthdays_per_week(arg, self.book))
+    def do_birthdays(self, arg):
+        "Print birthday for next days"
+        print(self.worker.get_birthdays_per_days(self.parse_input(arg), self.book))
 
     def do_add_birthday(self, arg):
         "Add/Change birthday for the contact"
@@ -112,7 +112,7 @@ class SantasHelper(cmd.Cmd):
     # ---- note commands ----
     def do_add_note(self, arg):
         "Adds a new note"
-        print(self.worker.add_note(self.book))
+        print(self.worker.add_note(self.parse_input(arg), self.book))
         self.save_book()
 
     def do_show_note(self, arg):

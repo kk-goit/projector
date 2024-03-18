@@ -110,9 +110,12 @@ class HelpWorker:
         rec.remove_birthday()
         return f"Birthday deleted from the contact {name}"
 
-    @input_error("")
-    def get_birthdays_per_week(self, args, contacts: AddressBook):
-        return contacts.get_birthdays_per_week(args)
+    @input_error("Give me number of days please")
+    def get_birthdays_per_days(self, args, contacts: AddressBook):
+        days = int(args[0])
+        if days < 1 or days > 365:
+            raise IncorrectFormatException("Days must be a positive number not greater than 365")
+        return contacts.get_birthdays_per_days(days)
 
     def print_all(self, contacts: AddressBook):
         chunk_size = 5
@@ -136,7 +139,7 @@ class HelpWorker:
         return "End of addres book"
 
     @input_error("Give me name please.")
-    def show_phone(self, args, contacts: AddressBook):
+    def show_contact(self, args, contacts: AddressBook):
         name = args[0]
         return str(contacts.find(name))
 
@@ -170,9 +173,11 @@ class HelpWorker:
         result = contacts.search(search_arg)
         return "\n".join([str(rec) for rec in result])
 
-    @input_error("")
-    def add_note(self, book: AddressBook):
-        text = input("Note text:")
+    @input_error("Give me some text plase")
+    def add_note(self, args, book: AddressBook):
+        text = " ".join(map(str, args))
+        if len(text.strip()) < 1:
+            raise ValueError
         index = book.add_note(text)
         return f"Added note with index {index}"
 
@@ -196,10 +201,10 @@ class HelpWorker:
         book.notes.delete(index)
         return f"Note with index {index} deleted"
 
-    @input_error("Give me note index please.")
+    @input_error("Give me note index and some new text please.")
     def change_note(self, args, book: AddressBook):
         index = args[0]
-        new_text = input("Enter a new text: ")
+        new_text = " ".join(map(str, args[1:]))
         book.notes.change_note(index, new_text)
         return f"Note with index {index} changed"
 

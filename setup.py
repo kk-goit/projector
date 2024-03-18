@@ -2,7 +2,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name='santashelper',
-    version='0.9.20',
+    version='1.0.1',
     description="console Santa's helper elf",
     url='https://github.com/kk-goit/projector',
     author='joBounty',

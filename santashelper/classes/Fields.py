@@ -45,6 +45,7 @@ class Name(Field):
 
 class Phone(Field):
     def parse(self, value: str):
+        value = re.sub("[^\d\.]", "", value)
         if len(value) != 10 or not value.isdecimal():
             raise IncorrectFormatException("Phone must have 10 digits")
         return value
