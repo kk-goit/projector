@@ -178,6 +178,50 @@ class SantasHelper(cmd.Cmd):
         "Lowering inputed command's chars"
         return super().completenames(text.lower(), *ignored)
 
+    # ---- competitions ----
+    def __auto_complete_contact_name(self, line: str):
+        "Complete contact names"
+        if len(line.split()) > 1:
+            # second level not supported
+            return []
+        part = line.lower()
+        if len(part) == 0:
+            return self.book.get_contact_names()
+        names = list()   
+        for name in self.book.get_contact_names():
+            if name.lower().startswith(part):
+                names.append(name)
+        return names
+    
+    def complete_show(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_address(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_email(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_add_wishlist_items(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_change_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_address(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_child(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_email(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_delete_phone(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_show_birthday(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+    def complete_show_wishlist(self, text, *ignored):
+        return self.__auto_complete_contact_name(text)
+
     # ---- internal logic ----
     def open_address_book(self):
         "Loading the adress book from file if exists"

@@ -225,7 +225,7 @@ class HelpWorker:
         tags = set(args)
         return book.notes.get_taged(tags)
 
-    @input_error("Give me item(s) for wishlist")
+    @input_error("Give me name for child and item(s) for wishlist")
     def add_wishlist_items(self, args, book: AddressBook):
         name = args[0]
         items = args[1:]

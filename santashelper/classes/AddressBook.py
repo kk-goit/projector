@@ -12,7 +12,7 @@ class AddressBook(UserDict[Name, Record]):
         self.notes = Notes()
 
     def add_record(self, rec: Record):
-        self.data[rec.name] = rec
+        self.data[str(rec.name)] = rec
 
     def add_note(self, text: str):
         return self.notes.add(Note(text))
@@ -67,7 +67,6 @@ class AddressBook(UserDict[Name, Record]):
             return f"No upcoming birthdays for {delta} days"
 
         sorted_result = dict(sorted(upcoming_birthdays.items()))
-
         result = ""
         for cong_day, names in sorted_result.items():
             result += "{:<10}({}): ".format(calendar.day_name[cong_day[1]], cong_day[0].strftime("%d.%m.%Y"))
@@ -102,3 +101,7 @@ class AddressBook(UserDict[Name, Record]):
             raise IncorrectFormatException("No contacts found")
 
         return found_contacts
+    
+    def get_contact_names(self):
+        "return List of contact names"
+        return list(map(str, self.data.keys()))
