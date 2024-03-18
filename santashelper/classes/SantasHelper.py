@@ -67,9 +67,9 @@ class SantasHelper(cmd.Cmd):
         "Print the address book"
         print(self.worker.print_all(self.book))
 
-    def do_birthdays(self, arg):
+    def do_birthdays(self, *arg):
         "Print birthday on the next week"
-        print(self.worker.get_birthdays_per_week(self.book))
+        print(self.worker.get_birthdays_per_week(arg, self.book))
 
     def do_add_birthday(self, arg):
         "Add/Change birthday for the contact"
