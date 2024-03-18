@@ -16,26 +16,26 @@ class SantasHelper(cmd.Cmd):
     # ---- commands ----
     def do_hello(self, arg):
         "Greeting command"
-        print("I'm Santa's Helper, how can I help you?")
+        print("How can I help you?")
         self.do_help(None)
 
     def do_exit(self, arg):
         "Stop work and good bye"
         self.save_book()
-        print("Good bye!")
+        print("Goodbye! Have a jolly day!")
         return True
 
     def do_close(self, arg):
         "Stop work and good bye"
         return self.do_exit(arg)
 
-    def do_delete(self, arg):
-        "Delete the contact"
+    def do_delete_child(self, arg):
+        "Remove a child contact"
         print(self.worker.delete_contact(self.parse_input(arg), self.book))
         self.save_book()
 
-    def do_add(self, arg):
-        "Adding new contact with phone, email, birthday and address"
+    def do_add_child(self, arg):
+        "Adding new child's contact with phone, email, birthday and address"
         print(self.worker.add_contact(self.parse_input(arg), self.book))
         self.save_book()
 
@@ -63,8 +63,8 @@ class SantasHelper(cmd.Cmd):
         "Show contacts phones"
         print(self.worker.show_phone(self.parse_input(arg), self.book))
 
-    def do_all(self, arg):
-        "Print the address book"
+    def do_list_children(self, arg):
+        "Print the list of children"
         print(self.worker.print_all(self.book))
 
     def do_birthdays(self, *arg):
@@ -148,6 +148,18 @@ class SantasHelper(cmd.Cmd):
     def do_show_notes_with_tags(self, arg):
         "Show notes that are taged by provided tags"
         print(self.worker.get_taged_notes(self.parse_input(arg), self.book))
+
+    def do_add_wishlist_items(self, arg):
+        "Add item(s) to wishlist"
+        print(self.worker.add_wishlist_items(self.parse_input(arg), self.book))
+
+    def do_show_wishlist(self, arg):
+        "Show child's wishlist"
+        print(self.worker.show_wishlist(self.parse_input(arg), self.book))
+
+    def do_generate_wishlist(self, arg):
+        "Show child's wishlist"
+        print(self.worker.generate_wishlist(self.parse_input(arg), self.book))              
 
     # ---- preprocessors ----
     def preloop(self):

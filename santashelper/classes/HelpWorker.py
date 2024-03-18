@@ -219,3 +219,24 @@ class HelpWorker:
     def get_taged_notes(self, args, book: AddressBook):
         tags = set(args)
         return book.notes.get_taged(tags)
+
+    @input_error("Give me item(s) for wishlist")
+    def add_wishlist_items(self, args, book: AddressBook):
+        name = args[0]
+        items = args[1:]
+        contact = book.find(name)
+        contact.add_wishlist_items(items)
+        return f"Added wishlist item(s) for child " + name
+
+    @input_error("Give me name for child")
+    def show_wishlist(self, args, book: AddressBook):
+        name = args[0]
+        contact = book.find(name)
+        return contact.show_wishlist()  
+
+    @input_error("Give me name for child")
+    def generate_wishlist(self, args, book: AddressBook):
+        name = args[0]
+        contact = book.find(name)
+        contact.generate_wishlist(name)    
+        return f"Generated wishlist for child " + name  

@@ -1,3 +1,5 @@
+import random
+
 from collections import UserDict, defaultdict
 from .Fields import *
 
@@ -8,6 +10,7 @@ class Record:
         self.birthday = None
         self.address = None
         self.email = None
+        self.wishlist = []
 
     def add_birthday(self, date: str):
         self.birthday = Birthday(date)
@@ -51,6 +54,22 @@ class Record:
             self.phones[0] = Phone(phone)
         else:
             self.add_phone(phone)
+
+    def add_wishlist_items(self, items):
+        self.wishlist = [WishlistItem(item) for item in items]
+
+    def show_wishlist(self):
+        if not self.wishlist:
+            raise NotFoundError("No items in wishlist")
+        return ', '.join([str(item) for item in self.wishlist])
+
+    def generate_wishlist(self, name):
+        if len(self.wishlist) > 0:
+            raise IncorrectFormatException("Wishlist is already exist")
+        top_10_items = ['iPhone', 'Nike Air Force', 'Watch', 'Lego', 'Barbie doll', 'PS5', 'Drone', 
+        'Disney Toy', 'Bike', 'Board Game']
+        random.shuffle(top_10_items)
+        self.wishlist = [WishlistItem(top_10_items[0])]             
 
     def __str__(self):
         res = f"Contact name: {self.name}"

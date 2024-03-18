@@ -1,7 +1,8 @@
 import unittest
+import random
 
 from santashelper.classes.Record import Record
-from santashelper.classes.Fields import IncorrectFormatException
+from santashelper.classes.Fields import IncorrectFormatException, NotFoundError
 
 
 class TestRecord(unittest.TestCase):
@@ -29,9 +30,9 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(self.record.phones[0].value, "9876543210")
         
     def test_add_birthday(self):
-        self.record.add_birthday("01.01.2000")
+        self.record.add_birthday("01.01.2014")
         self.assertIsNotNone(self.record.birthday)
-        self.assertEqual(str(self.record.birthday), "01.01.2000")
+        self.assertEqual(str(self.record.birthday), "01.01.2014")
     
     def test_add_birthday_with_validation_error(self):
         with self.assertRaises(IncorrectFormatException) as context:
@@ -40,7 +41,7 @@ class TestRecord(unittest.TestCase):
         
         
     def test_remove_birthday(self):
-        self.record.add_birthday("01.01.2000")
+        self.record.add_birthday("01.01.2016")
         self.record.remove_birthday()
         self.assertIsNone(self.record.birthday)
         
@@ -64,9 +65,9 @@ class TestRecord(unittest.TestCase):
         self.record.add_phone("9876543210")
         self.record.add_email("john.doe@example.com")
         self.record.add_address("123 Main St, City, Country")
-        self.record.add_birthday("01.01.2000")
+        self.record.add_birthday("01.01.2010")
         
-        expected_str = "Contact name: John Doe, phones: 1234567890; 9876543210, email: john.doe@example.com, address: 123 Main St, City, Country, birthday: 01.01.2000"
+        expected_str = "Contact name: John Doe, phones: 1234567890; 9876543210, email: john.doe@example.com, address: 123 Main St, City, Country, birthday: 01.01.2010"
         self.assertEqual(str(self.record), expected_str)
     
     def test_str_representation2(self):
@@ -75,3 +76,37 @@ class TestRecord(unittest.TestCase):
         
         expected_str = "Contact name: John Doe, phones: 1234567890; 9876543210"
         self.assertEqual(str(self.record), expected_str)
+
+    def test_add_wishlist_items(self):
+        items = ['iPhone', 'Nike Air Force', 'Watch']
+        self.record.add_wishlist_items(items)
+        self.assertEqual(len(self.record.wishlist), len(items))
+        for item, wishlist_item in zip(items, self.record.wishlist):
+            self.assertEqual(wishlist_item, item)
+
+    def test_add_wishlist_items_empty_list(self):
+        items = []
+        self.record.add_wishlist_items(items)
+        self.assertEqual(len(self.record.wishlist), 0)
+
+    def test_show_wishlist(self):
+        items = ['iPhone', 'Nike Air Force', 'Watch']
+        self.record.add_wishlist_items(items)
+        expected_str = ", ".join(items)
+        self.assertEqual(self.record.show_wishlist(), expected_str)
+
+    def test_show_wishlist_empty(self):
+        with self.assertRaises(NotFoundError):
+            self.record.show_wishlist()
+
+    def test_generate_wishlist(self):
+        self.record.generate_wishlist("John Doe")
+        self.assertEqual(len(self.record.wishlist), 1)
+        top_10_items = ['iPhone', 'Nike Air Force', 'Watch', 'Lego', 'Barbie doll', 'PS5', 'Drone', 'Disney Toy', 'Bike', 'Board Game']
+        self.assertIn(self.record.wishlist[0], top_10_items)
+
+    def test_generate_wishlist_existing(self):
+        items = ['iPhone', 'Nike Air Force', 'Watch']
+        self.record.add_wishlist_items(items)
+        with self.assertRaises(IncorrectFormatException):
+            self.record.generate_wishlist("John Doe")    

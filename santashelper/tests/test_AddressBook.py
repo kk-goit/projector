@@ -73,7 +73,7 @@ class TestSearchAddressBook(unittest.TestCase):
         self.address_book = AddressBook()
         record1 = Record("John Doe")
         record1.add_phone("1234567890")
-        record1.add_birthday("01.01.1990")
+        record1.add_birthday("01.01.2008")
         record1.add_email("john.doe@example.com")
         record1.add_address("123 Main St")
         self.address_book.add_record(record1)
@@ -86,7 +86,7 @@ class TestSearchAddressBook(unittest.TestCase):
 
         record3 = Record("Bob Johnson")
         record3.add_phone("5555555555")
-        record3.add_birthday("12.12.1980")
+        record3.add_birthday("12.12.2010")
         self.address_book.add_record(record3)
 
     def test_search_with_name(self):
@@ -100,7 +100,7 @@ class TestSearchAddressBook(unittest.TestCase):
         self.assertEqual(search_results[0].name.value, "John Doe")
 
     def test_search_with_birthday(self):
-        search_results = self.address_book.search("1990")
+        search_results = self.address_book.search("2008")
         self.assertEqual(len(search_results), 1)
         self.assertEqual(search_results[0].name.value, "John Doe")
 
