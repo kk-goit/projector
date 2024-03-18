@@ -11,6 +11,8 @@ class NotesNotFoundError(Exception):
     """Exception raised when notes are not found."""
     pass
 
+class NotFoundError(Exception):
+    pass
 
 class Field:
     __value = None
@@ -63,14 +65,22 @@ class Email(Field):
 class Birthday(Field):
     def parse(self, value):
         try:
-            return datetime.strptime(value, '%d.%m.%Y')
+            birthdate = datetime.strptime(value, '%d.%m.%Y')
+            self._validate_age(birthdate)
+            return birthdate
         except ValueError:
             raise IncorrectFormatException(
                 'Birthday must be in format DD.MM.YYYY')
 
     def __str__(self):
         return self.value.strftime("%d.%m.%Y")
-    
+
+    def _validate_age(self, birthdate):
+        current_date = datetime.now()
+        age = current_date.year - birthdate.year - ((current_date.month, current_date.day) < (birthdate.month, birthdate.day))
+        if age > 16:
+            raise IncorrectFormatException("Alas, it seems this little one has outgrown their childlike wonder")      
+ 
         
 class Note(Field):
     def __init__(self, value: str):
@@ -95,3 +105,7 @@ class Note(Field):
         if len(self.tags) > 0:
             ret += "\ntags: " + ", ".join(self.tags)
         return ret
+
+
+class WishlistItem(Field):
+    pass        

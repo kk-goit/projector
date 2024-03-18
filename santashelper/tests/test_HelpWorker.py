@@ -41,9 +41,9 @@ class TestHelpWorker(unittest.TestCase):
 
     def test_add_contact_valid_birthday(self):
         # Перевірка додавання контакту з коректною датою народження
-        args = ["John Doe", "01.01.1990"]
+        args = ["John Doe", "01.01.2010"]
         self.assertEqual(self.worker.add_contact(args, self.book), "Contact added.")
-        self.assertIn("John Doe", [rec.name.value for rec in self.book.get_all_contacts()]) 
+        self.assertIn("John Doe", [rec.name.value for rec in self.book.get_all_contacts()])
     
 class TestHelpWorkerChangeContact(unittest.TestCase):
     def setUp(self):
@@ -99,6 +99,17 @@ class TestHelpWorkerDeleteContact(unittest.TestCase):
         except KeyError as e:
             self.assertEqual(str(e), expected_output)
 
+class TestBirthdayValidation(unittest.TestCase):
+    def setUp(self):
+        self.worker = HelpWorker()
+        self.book = AddressBook()
+
+    def test_validate_age_invalid(self):
+        self.worker.add_contact(["Lucas"], self.book)
+        try:
+            self.worker.add_birthday(["Lucas", "01.01.2000"], self.book)
+        except IncorrectFormatException as e:    
+            self.assertEqual(e.args[0], "Alas, it seems this little one has outgrown their childlike wonder")
 
 if __name__ == "__main__":
     unittest.main()
